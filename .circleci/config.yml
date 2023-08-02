@@ -12,7 +12,7 @@ jobs:
           name: Build Docker image
           command: |
             docker build -t node-app .
-            docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
+            docker login -u semajkp4 -p JG!4727xd
             docker push node-app:latest
 
   deploy:
