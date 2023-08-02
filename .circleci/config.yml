@@ -1,0 +1,37 @@
+version: 2.1
+
+jobs:
+
+  build:
+    docker:
+      - image: cimg/node:14.15.0
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Docker image
+          command: |
+            docker build -t node-app .
+            docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
+            docker push node-app:latest
+
+  deploy:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run:
+          name: Deploy to DigitalOcean Kubernetes
+          command: |
+            echo "$KUBE_CONFIG" | base64 --decode > kubeconfig.yaml
+            kubectl --kubeconfig kubeconfig.yaml apply -f deployment.yaml
+            kubectl --kubeconfig kubeconfig.yaml apply -f service.yaml
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
