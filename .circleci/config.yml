@@ -8,27 +8,24 @@ jobs:
     steps:
       - checkout
 
-      - setup_remote_docker
-
       - run:
           name: Create apt lists dir
           command: |
             sudo mkdir -p /var/lib/apt/lists/partial
             sudo touch /var/lib/apt/lists/partial/lock
             sudo chown -R circleci:circleci /var/lib/apt/lists/partial
-      - run:
-          name: Update apt packages
-          command: sudo apt-get update -y
 
       - run:
           name: Create lock file
           command: sudo touch /var/lib/apt/lists/lock
 
       - run:
+          name: Install nvm
+          command: curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+
+      - run:
           name: Install Node.js
-          command: |
-            curl -sL https://deb.nodesource.com/setup_14.x | bash - 
-            apt-get install -y nodejs
+          command: nvm install node
 
       # Gives CircleCI user sudo permissions
       - run:
@@ -44,18 +41,26 @@ jobs:
           name: Build app
           command: nmp run build
 
-      - run:
-          name: Build Docker image
-          command: |
-            docker build -f Dockerfile -t node-app .
-            docker login -u semajkp4 -p JG!4727xd
-            docker push node-app:latest
+#      - run:
+#          name: Build Docker image
+#          command: |
+#            docker build -f Dockerfile -t node-app .
+#            docker login -u semajkp4 -p JG!4727xd
+#            docker push node-app:latest
 
   deploy:
     docker:
       - image: cimg/base:stable
     steps:
       - checkout
+      - setup_remote_docker
+      - run:
+          name: Build Docker Image
+          command: |
+            docker build -f Dockerfile -t node-app .
+            docker login -u semajkp4 -p JG!4727xd
+            docker push node-app:latest
+
       - run:
           name: Deploy to DigitalOcean Kubernetes
           command: |
