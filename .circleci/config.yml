@@ -9,6 +9,12 @@ jobs:
       - checkout
 
       - setup_remote_docker
+      - run:
+          name: Create apt lists dir
+          command: |
+            sudo mkdir -p /var/lib/apt/lists/partial
+            sudo touch /var/lib/apt/lists/partial/lock
+            sudo chown -R circleci:circleci /var/lib/apt/lists/partial
 
       - run:
           name: Install Node.js
