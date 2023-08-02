@@ -23,11 +23,12 @@ jobs:
           name: Install nvm
           command: |
             curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-            source ~/.nvm/nvm.sh
+      - run:
+          name: Load nvm
+          command: . /root/.nvm/nvm.sh
+
       - run:
           name: Install Node.js
-          environment:
-            PATH: ~/.nvm/versions/node/v14.15.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
           command: nvm install node
 
       # Gives CircleCI user sudo permissions
